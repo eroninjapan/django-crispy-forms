@@ -192,6 +192,7 @@ class FormHelper(DynamicLayoutHandler):
     formset_error_title = None
     form_show_errors = True
     render_unmentioned_fields = False
+    render_unmentioned_modelform_fields = False
     render_hidden_fields = False
     render_required_fields = False
     _help_text_inline = False
@@ -315,16 +316,17 @@ class FormHelper(DynamicLayoutHandler):
 
         # If the user has Meta.fields defined, not included in the layout,
         # we suppose they need to be rendered
-        if hasattr(form, 'Meta'):
-            if hasattr(form.Meta, 'fields'):
-                current_fields = set(getattr(form, 'fields', []))
-                meta_fields = set(getattr(form.Meta, 'fields'))
+        if self.render_unmentioned_modelform_fields:
+            if hasattr(form, 'Meta'):
+                if hasattr(form.Meta, 'fields'):
+                    current_fields = set(getattr(form, 'fields', []))
+                    meta_fields = set(getattr(form.Meta, 'fields'))
 
-                fields_to_render = current_fields & meta_fields
-                left_fields_to_render = fields_to_render - form.rendered_fields
+                    fields_to_render = current_fields & meta_fields
+                    left_fields_to_render = fields_to_render - form.rendered_fields
 
-                for field in left_fields_to_render:
-                    html += render_field(field, form, self.form_style, context)
+                    for field in left_fields_to_render:
+                        html += render_field(field, form, self.form_style, context)
 
         return mark_safe(html)
 
